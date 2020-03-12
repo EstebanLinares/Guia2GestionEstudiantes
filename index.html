@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" type="text/css" href="css/style.css" />
+    <title>Estudiantes</title>
+</head>
+<body>
+    <div id="container" style="width:700px;">
+    </div>
+
+    <div>
+            <label><h3>Búsqueda de estudiante:</h3></label>
+            <input type="text" placeholder="Código de estudiante"  id="tCodigo" name="email"/>
+        <button onclick="gestionarEstudiantes.Find(this)">Buscar estudiante</button>
+
+    </div>
+    <br>
+
+    <div id="datos">
+        <div id="titulo">
+                <label><b>Datos de estudiante </b></label>
+        </div>
+            <br>
+            <br>
+            <label ><b>Número en lista : </b></label>
+            <p id="bNumero"> </p>
+            <label ><b>Nombre : </b></label>
+            <p id="bNombre"> </p>
+            <label ><b>Apellido : </b></label>
+            <p id="bApellido"></p>
+            <label ><b>Nota: </b></label>
+            <p id="bNota"></p>
+            <label ><b>Edad : </b></label>
+            <p id="bEdad"></p>
+    </div>
+
+    
+</body>
+
+<script>
+    var gestionarEstudiantes = new function () {
+        document.getElementById('datos').style.display="none";
+
+        this.estudiantes = [
+            { No:1, Codigo: "125455", Nombre: 'Esteban', Apellido: 'Linares', Notas: 5, Edad: 21},
+            { No:2, Codigo: "321321", Nombre: 'Rodrigo', Apellido: 'Torres', Notas: 5, Edad: 19},
+            
+        ]
+
+        this.col = [];
+
+        this.createTable = function () {
+
+            for (var i = 0; i < this.estudiantes.length; i++) {
+                for (var key in this.estudiantes[i]) {
+                    if (this.col.indexOf(key) === -1) {
+                        this.col.push(key);
+                    }
+                }
+            }
+
+            // Creación de la tabla
+            var table = document.createElement('table');
+            table.setAttribute('id', 'booksTable');    
+
+            var tr = table.insertRow(-1);              
+
+            for (var h = 0; h < this.col.length; h++) {
+                
+                var th = document.createElement('th');
+                th.innerHTML = this.col[h].replace('_', ' ');
+                tr.appendChild(th);
+            }
+
+            
+            for (var i = 0; i < this.estudiantes.length; i++) {
+
+                tr = table.insertRow(-1);           
+
+                for (var j = 0; j < this.col.length; j++) {
+                    var tabCell = tr.insertCell(-1);
+                    tabCell.innerHTML = this.estudiantes[i][this.col[j]];
+                }
+
+                
+
+                this.td = document.createElement('td');
+
+                // Cancelar
+                tr.appendChild(this.td);
+                var lblCancel = document.createElement('label');
+                lblCancel.innerHTML = '✖';
+                lblCancel.setAttribute('onclick', 'gestionarEstudiantes.Cancel(this)');
+                lblCancel.setAttribute('style', 'display:none;');
+                lblCancel.setAttribute('title', 'Cancel');
+                lblCancel.setAttribute('id', 'lbl' );
+                this.td.appendChild(lblCancel);
+
+              
+              
+
+                //Editar
+                tr.appendChild(this.td);
+                var btUpdate = document.createElement('input');
+
+                btUpdate.setAttribute('type', 'button');    // SET ATTRIBUTES.
+                btUpdate.setAttribute('value', 'Editar');
+                btUpdate.setAttribute('id', 'Edit' );
+                btUpdate.setAttribute('style', 'background-color:#44CCEB;');
+                btUpdate.setAttribute('onclick', 'gestionarEstudiantes.Update(this)');   // ADD THE BUTTON's 'onclick' EVENT.
+                this.td.appendChild(btUpdate);
+
+
+                //Eliminar
+                this.td = document.createElement('th');
+                tr.appendChild(this.td);
+                var btDelete = document.createElement('input');
+                btDelete.setAttribute('type', 'button');    // SET INPUT ATTRIBUTE.
+                btDelete.setAttribute('value', 'Eliminar');
+                btDelete.setAttribute('style', 'background-color:#ED5650;');
+                btDelete.setAttribute('onclick', 'gestionarEstudiantes.Delete(this)');   // ADD THE BUTTON's 'onclick' EVENT.
+                this.td.appendChild(btDelete);
+            }
+
+                
+               
+                var btnBuscar = document.createElement('input');
+                btnBuscar.setAttribute('type', 'button');       
+                btnBuscar.setAttribute('value', 'Buscar');
+                btnBuscar.setAttribute('id', 'buscar' );
+                btnBuscar.setAttribute('style', 'background-color:yellow;');
+                btnBuscar.setAttribute('onclick', 'gestionarEstudiantes.CreateNew(this)');       
+            
+
+
+           
+
+            tr = table.insertRow(-1);          
+
+            for (var j = 0; j < this.col.length; j++) {
+                var newCell = tr.insertCell(-1);
+                if (j >= 0) {
+
+                    if (j == 6) {  
+
+                        var select = document.createElement('select');      
+                        select.innerHTML = '<option value=""></option>';
+                       
+                        newCell.appendChild(select);
+                    }
+                    else {
+                        var tBox = document.createElement('input');         
+                        tBox.setAttribute('type', 'text');
+                        tBox.setAttribute('value', '');
+                        newCell.appendChild(tBox);
+                    }
+                }
+            }
+
+            this.td = document.createElement('td');
+            tr.appendChild(this.td);
+
+            //Crear estudiante
+
+            var btNew = document.createElement('input');
+
+            btNew.setAttribute('type', 'button');      
+            btNew.setAttribute('value', 'Agregar');
+            btNew.setAttribute('id', 'New' );
+            btNew.setAttribute('style', 'background-color:green;');
+            btNew.setAttribute('onclick', 'gestionarEstudiantes.CreateNew(this)');       
+            this.td.appendChild(btNew);
+
+            var div = document.getElementById('container');
+            div.innerHTML = '';
+            div.appendChild(table);    
+        };
+
+        // Operaciones
+
+       
+        this.Cancel = function (oButton) {
+
+          
+            oButton.setAttribute('style', 'display:none; float:none;');
+
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+
+            
+            var btSave = document.getElementById('Save' + (activeRow - 1));
+            btSave.setAttribute('style', 'display:none;');
+
+            
+            var btUpdate = document.getElementById('Edit' + (activeRow - 1));
+            btUpdate.setAttribute('style', 'display:block; margin:0 auto; background-color:#44CCEB;');
+
+            var tab = document.getElementById('booksTable').rows[activeRow];
+
+            for (i = 0; i < this.col.length; i++) {
+                var td = tab.getElementsByTagName("td")[i];
+                td.innerHTML = this.estudiantes[(activeRow - 1)][this.col[i]];
+            }
+        }
+
+
+        // Editar
+        this.Update = function (oButton) {
+            document.getElementById('datos').style.display="none";
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            var tab = document.getElementById('booksTable').rows[activeRow];
+
+           
+            for (i = 1; i < 4; i++) {
+                if (i == 2) {
+                    var td = tab.getElementsByTagName("td")[i];
+                    var ele = document.createElement('select');      
+                    ele.innerHTML = '<option value="' + td.innerText + '">' + td.innerText + '</option>';
+                    for (k = 0; k < this.category.length; k++) {
+                        ele.innerHTML = ele.innerHTML +
+                            '<option value="' + this.category[k] + '">' + this.category[k] + '</option>';
+                    }
+                    td.innerText = '';
+                    td.appendChild(ele);
+                }
+                else {
+                    var td = tab.getElementsByTagName("td")[i];
+                    var ele = document.createElement('input');     
+                    ele.setAttribute('type', 'text');
+                    ele.setAttribute('value', td.innerText);
+                    td.innerText = '';
+                    td.appendChild(ele);
+                }
+            }
+
+            var lblCancel = document.getElementById('lbl' + (activeRow - 1));
+            lblCancel.setAttribute('style', 'cursor:pointer; display:block; width:20px; float:left; position: absolute;');
+
+            var btSave = document.getElementById('Save' + (activeRow - 1));
+            btSave.setAttribute('style', 'display:block; margin-left:30px; float:left; background-color:#2DBF64;');
+
+        
+            oButton.setAttribute('style', 'display:none;');
+        };
+
+
+        // Eliminar
+        this.Delete = function (oButton) {
+            document.getElementById('datos').style.display="none";
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            this.estudiantes.splice((activeRow - 1), 1);    
+            this.createTable();                         
+        };
+
+        // Guardar
+        this.Save = function (oButton) {
+            document.getElementById('datos').style.display="none";
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            var tab = document.getElementById('booksTable').rows[activeRow];
+
+            // Actualizar
+            for (i = 1; i < this.col.length; i++) {
+                var td = tab.getElementsByTagName("td")[i];
+                if (td.childNodes[0].getAttribute('type') == 'text' || td.childNodes[0].tagName == 'SELECT') { 
+                    this.estudiantes[(activeRow - 1)][this.col[i]] = td.childNodes[0].value;     
+                }
+            }
+            //recargar la tabla
+            this.createTable();     
+        }
+
+
+        // Crear
+        this.CreateNew = function (oButton) {
+            document.getElementById('datos').style.display="none";
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            var tab = document.getElementById('booksTable').rows[activeRow];
+            var obj = {};
+
+            
+            for (i = 1; i < this.col.length; i++) {
+                var td = tab.getElementsByTagName("td")[i];
+                if (td.childNodes[0].getAttribute('type') == 'text' || td.childNodes[0].tagName == 'SELECT') {      // CHECK IF ELEMENT IS A TEXTBOX OR SELECT.
+                    var txtVal = td.childNodes[0].value;
+                    if (txtVal != '') {
+                        obj[this.col[i]] = txtVal.trim();
+                    }
+                    else {
+                        obj = '';
+                        alert('Complete todos los datos de registro');
+                        break;
+                    }
+                }
+            }
+            obj[this.col[0]] = this.estudiantes.length + 1;     // NEW ID.
+
+            if (Object.keys(obj).length > 0) {      // CHECK IF OBJECT IS NOT EMPTY.
+                this.estudiantes.push(obj);             // PUSH (ADD) DATA TO THE JSON ARRAY.
+                this.createTable();                 // REFRESH THE TABLE.
+            }
+        }
+       
+
+        this.Find = function(oButton){
+            var activeRow = oButton.parentNode.parentNode.rowIndex;
+            
+            var valor= document.getElementById('tCodigo').value;
+          
+               for (var i = 0; i < this.estudiantes.length ; i++) {
+                   var cEstudiante = this.estudiantes[i].Codigo;
+                if(cEstudiante== valor){
+                    existe=true;
+                    document.getElementById('bNumero').textContent=  this.estudiantes[i].No;
+                    document.getElementById('bNombre').textContent=  this.estudiantes[i].Nombre;
+                    document.getElementById('bApellido').textContent=  this.estudiantes[i].Apellido;
+                    document.getElementById('bNota').textContent=  this.estudiantes[i].Notas;
+                    document.getElementById('bEdad').textContent=  this.estudiantes[i].Edad;
+                    document.getElementById('datos').style.display="block";
+                    break;
+                }
+                else{
+                    document.getElementById('datos').style.display="none";
+                    existe=false;
+
+                }
+                
+            }
+            if(existe==false){
+                alert("Estudiante no encontrado");
+            }
+        }
+
+
+    }
+
+    gestionarEstudiantes.createTable();
+</script>
+
+</html>
